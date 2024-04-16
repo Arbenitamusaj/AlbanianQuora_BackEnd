@@ -1,4 +1,7 @@
 
+using AlbanianQuora.Data;
+using Microsoft.EntityFrameworkCore;
+
 namespace AlbanianQuora
 {
     public class Program
@@ -11,6 +14,9 @@ namespace AlbanianQuora
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+            builder.Services.AddDbContext<UserDbContext>(options =>
+            options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
@@ -23,7 +29,7 @@ namespace AlbanianQuora
                 app.UseSwaggerUI();
             }
 
-            app.UseHttpsRedirection();
+         
 
             app.UseAuthorization();
 
