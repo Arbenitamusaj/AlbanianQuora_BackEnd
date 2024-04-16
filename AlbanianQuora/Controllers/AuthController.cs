@@ -7,14 +7,9 @@ namespace AlbanianQuora.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class AuthController : ControllerBase
+    public class Authcontroller (UserDbContext context) : ControllerBase
     {
-        private readonly UserDbContext _context;
-
-        public AuthController(UserDbContext context)
-        {
-            _context = context;
-        }
+        private readonly UserDbContext _context = context;
 
         [HttpPost("register")]
         public async Task<IActionResult> Register(User user)
@@ -26,8 +21,8 @@ namespace AlbanianQuora.Controllers
             }
 
             // Hash the password
-            //using var hmac = new HMACSHA512();
-            //user.Password = Convert.ToBase64String(hmac.ComputeHash(Encoding.UTF8.GetBytes(user.Password)));
+            using var hmac = new HMACSHA512();
+            user.Password = Convert.ToBase64String(hmac.ComputeHash(Encoding.UTF8.GetBytes(user.Password)));
 
             // Add user to the database
             _context.Users.Add(user);
