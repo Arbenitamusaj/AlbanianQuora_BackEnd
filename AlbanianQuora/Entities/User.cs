@@ -4,7 +4,7 @@ namespace AlbanianQuora.Entities
 {
     public class User
     {
-        public int UserId { get; set; }
+        public Guid UserId { get; set; } = Guid.NewGuid();
 
         [Required]
         public string FirstName { get; set; }
@@ -18,6 +18,7 @@ namespace AlbanianQuora.Entities
 
         [Required]
         public string Password { get; set; }
+
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
