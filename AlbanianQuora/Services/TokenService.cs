@@ -8,13 +8,13 @@ namespace AlbanianQuora.Services
 {
     public class TokenService
     {
-        public static string GenerateToken(int id)
+        public static string GenerateToken(Guid UserId)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes("ALBANIAN_QUORA_SECRET_KEY_TOKEN_GENERATE");
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-               Subject = new ClaimsIdentity(new[] { new Claim(ClaimTypes.NameIdentifier, id.ToString())}),
+               Subject = new ClaimsIdentity(new[] { new Claim(ClaimTypes.NameIdentifier, UserId.ToString())}),
                Expires = DateTime.UtcNow.AddDays(7),
                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };

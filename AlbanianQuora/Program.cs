@@ -17,6 +17,16 @@ namespace AlbanianQuora
             builder.Services.AddDbContext<UserDbContext>(options =>
             options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowSpecificOrigin",
+                    policyBuilder => policyBuilder
+                        .WithOrigins("http://localhost:3000") // Specify the client origin
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                );
+            });
+
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
@@ -29,7 +39,9 @@ namespace AlbanianQuora
                 app.UseSwaggerUI();
             }
 
-         
+            app.UseCors("AllowSpecificOrigin");
+
+            app.UseRouting();
 
             app.UseAuthorization();
 

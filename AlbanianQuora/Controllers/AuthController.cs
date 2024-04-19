@@ -3,10 +3,14 @@ using Microsoft.AspNetCore.Mvc;
 using AlbanianQuora.Data;
 using System.Security.Cryptography;
 using System.Text;
+using System.Linq;
 using AlbanianQuora.Services;
 using System.Security.Claims;
+using System.Web.Http.Cors;
+using BCrypt.Net;
 namespace AlbanianQuora.Controllers
 {
+    [EnableCors(origins: "http://localhost:3000", headers: "*", methods: "*")]
     [ApiController]
     [Route("[controller]")]
     public class Authcontroller(UserDbContext context) : ControllerBase
@@ -16,17 +20,13 @@ namespace AlbanianQuora.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register(User user)
         {
-            // Check if user already exists
             if (_context.Users.Any(u => u.Email == user.Email))
             {
-                return BadRequest("User already exists.");
+                return BadRequest("User already exists."); 
             }
 
-            // Hash the password
-            using var hmac = new HMACSHA512();
-            user.Password = Convert.ToBase64String(hmac.ComputeHash(Encoding.UTF8.GetBytes(user.Password)));
+            user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
 
-            // Add user to the database
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
@@ -34,21 +34,25 @@ namespace AlbanianQuora.Controllers
         }
 
 
-        [HttpPost("/login")]
-
+        [HttpPost("login")]
         public IActionResult Login([FromBody] UserLogin request)
         {
-            var user = context.Users.Where(user => user.Email == request.Email)
-                                      .Where(user => user.Password == request.Password)
-                                      .FirstOrDefault();
+            var user = _context.Users.FirstOrDefault(u => u.Email == request.Email);
             if (user == null)
+            {
+                return Unauthorized("User not found.");
+            }
+
+            if (!BCrypt.Net.BCrypt.Verify(request.Password, user.Password))
             {
                 return Unauthorized("Email or password did not match");
             }
-            var token = TokenService.GenerateToken(user.UserId);
 
-            return Ok(new Dictionary<string, string>() { { "token", token } });
+            var token = TokenService.GenerateToken(user.UserId);
+            return Ok(new { token = token });
         }
+
+
 
         [HttpGet("me")]
         public IActionResult GetById([FromQuery] string token)
@@ -65,7 +69,7 @@ namespace AlbanianQuora.Controllers
                 return Unauthorized("Token does not contain required claim.");
             }
 
-            if (!int.TryParse(idClaim.Value, out var id))
+            if (!Guid.TryParse(idClaim.Value, out Guid id))
             {
                 return Unauthorized("Invalid user ID claim");
             }
@@ -76,7 +80,7 @@ namespace AlbanianQuora.Controllers
                 return NotFound("user not found");
             }
 
-            return Ok(user); // Assuming you want to return user details
+            return Ok(new { Message = "User registered successfully", UUID = user.UserId });
         }
     }
 }
