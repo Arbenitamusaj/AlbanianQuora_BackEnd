@@ -16,7 +16,7 @@ namespace AlbanianQuora.tests
             var options = new DbContextOptionsBuilder<UserDbContext>()
             .UseNpgsql("Host=localhost; Port=5432; Database=mydb; Username=postgres; Password=postgres")
             .Options;
-
+            //Testing
             var dbContext = new UserDbContext(options);
             var controller = new UserController(dbContext);
 
