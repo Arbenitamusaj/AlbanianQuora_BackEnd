@@ -5,6 +5,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AlbanianQuora.Controllers
 {
+
+    [ApiController]
+    [Route("api/[controller]")]
     public class UserController : Controller
     {
         private readonly UserDbContext _context;
@@ -17,7 +20,8 @@ namespace AlbanianQuora.Controllers
         [HttpGet]
         public async Task<IActionResult> GetUsers()
         {
-            return Ok(await _context.Users.ToListAsync());
+            var user = await _context.Users.ToListAsync();
+            return Ok(user);
         }
 
         [HttpGet("{id}")]
@@ -34,7 +38,7 @@ namespace AlbanianQuora.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutUser(Guid id, User user)
         {
-            if(id != user.UserId)
+            if (id != user.UserId)
             {
                 return BadRequest();
             }
@@ -47,7 +51,7 @@ namespace AlbanianQuora.Controllers
             }
             catch (Exception ex)
             {
-                if(!UserExists(id))
+                if (!UserExists(id))
                 {
                     return NotFound(ex.Message);
                 }
@@ -72,7 +76,7 @@ namespace AlbanianQuora.Controllers
         public async Task<IActionResult> DeleteUser(Guid id)
         {
             var user = await _context.Users.FindAsync(id);
-            if (user == null) { return NotFound();}
+            if (user == null) { return NotFound(); }
 
             _context.Users.Remove(user);
             await _context.SaveChangesAsync();

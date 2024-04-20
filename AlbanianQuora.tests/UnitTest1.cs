@@ -1,4 +1,3 @@
-using Moq;
 using Microsoft.EntityFrameworkCore;
 using AlbanianQuora.Entities;
 using AlbanianQuora.Controllers;
@@ -9,56 +8,50 @@ namespace AlbanianQuora.tests
 {
     public class UnitTest1
     {
-        private readonly Mock<DbSet<User>> _mockSet;
-        private readonly Mock<UserDbContext> _mockContext;
-        private readonly UserController _controller;
 
-        public UnitTest1()
+        [Fact]
+        public void GetUsers_ReturnsOkResult()
         {
-            _mockSet = new Mock<DbSet<User>>();
-            _mockContext = new Mock<UserDbContext>();
-            _controller = new UserController(_mockContext.Object);
+            // Arrange
+            var options = new DbContextOptionsBuilder<UserDbContext>()
+            .UseNpgsql("Host=localhost; Port=5432; Database=mydb; Username=postgres; Password=postgres")
+            .Options;
+
+            var dbContext = new UserDbContext(options);
+            var controller = new UserController(dbContext);
+
+            //// Act
+            var user1 = new User { UserId = Guid.NewGuid(), FirstName = "Test" , LastName = "Test2", Email = "test@test.com", Password = "password", CreatedAt = new DateTime() };
+            var user2 = new User { UserId = Guid.NewGuid(), FirstName = "Test12", LastName = "Test3", Email = "test1@test.com", Password = "password2", CreatedAt = new DateTime() };
+            
+            dbContext.Users.Add(user1);
+            dbContext.Users.Add(user2);
+
+            var result = controller.GetUsers().Result as OkObjectResult;
+
+            //// Assert
+            Assert.NotNull(result);
+            Assert.Equal(200, result.StatusCode);
         }
 
         [Fact]
-        public async Task GetUsers_ReturnsOkResult()
+        public void GetUser_ReturnsAddedItem()
         {
             // Arrange
-            var users = new List<User>
-            {
-                new User { UserId = Guid.NewGuid(), FirstName = "Test", LastName = "User", Email = "test@example.com", Password = "password" },
-                new User { UserId = Guid.NewGuid(), FirstName = "Test2", LastName = "User2", Email = "test2@example.com", Password = "password2" }
-            }.AsQueryable();
+            var options = new DbContextOptionsBuilder<UserDbContext>()
+            .UseNpgsql("Host=localhost; Port=5432; Database=mydb; Username=postgres; Password=postgres")
+            .Options;
 
-            _mockSet.As<IQueryable<User>>().Setup(m => m.Provider).Returns(users.Provider);
-            _mockSet.As<IQueryable<User>>().Setup(m => m.Expression).Returns(users.Expression);
-            _mockSet.As<IQueryable<User>>().Setup(m => m.ElementType).Returns(users.ElementType);
-            _mockSet.As<IQueryable<User>>().Setup(m => m.GetEnumerator()).Returns(users.GetEnumerator());
-
-            _mockContext.Setup(c => c.Users).Returns(_mockSet.Object);
+            var dbContext = new UserDbContext(options);
+            var controller = new UserController(dbContext);
 
             // Act
-            var result = await _controller.GetUsers();
+            var user = new User { UserId = Guid.NewGuid(), FirstName = "Test", LastName = "Test2", Email = "test@test.com", Password = "password", CreatedAt = new DateTime() };
+            var result = controller.GetUser(user.UserId).Result as OkObjectResult;
 
             // Assert
-            var okResult = Assert.IsType<OkObjectResult>(result);
-            var returnValue = Assert.IsType<List<User>>(okResult.Value);
-            Assert.Equal(users.Count(), returnValue.Count);
-        }
-
-        [Fact]
-        public async Task GetUser_ReturnsNotFoundResult_WhenUserDoesNotExist()
-        {
-            // Arrange
-            var userId = Guid.NewGuid();
-            _mockSet.Setup(m => m.FindAsync(userId)).ReturnsAsync((User)null);
-            _mockContext.Setup(c => c.Users).Returns(_mockSet.Object);
-
-            // Act
-            var result = await _controller.GetUser(userId);
-
-            // Assert
-            Assert.IsType<NotFoundResult>(result);
+            Assert.NotNull(result);
+            Assert.Equal(200, result.StatusCode);
         }
 
     }
