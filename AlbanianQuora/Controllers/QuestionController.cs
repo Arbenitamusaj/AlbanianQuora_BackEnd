@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using AlbanianQuora.DTO;
 using AlbanianQuora.Data;
 using AlbanianQuora.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-// For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+
 
 namespace AlbanianQuora.Controllers
 {
@@ -31,8 +28,21 @@ namespace AlbanianQuora.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> PostQuestion(Question question)
+        public async Task<IActionResult> PostQuestion([FromBody] QuestionPostDTO questionDto)
         {
+            if (questionDto == null)
+            {
+                return BadRequest("Invalid question data");
+            }
+
+            var question = new Question
+            {
+                QuestionTitle = questionDto.QuestionTitle,
+                QuestionDescription = questionDto.QuestionDescription,
+                QuestionCategoryId = questionDto.QuestionCategoryId,
+                CreatedAt = DateTime.UtcNow  
+            };
+
             _context.Questions.Add(question);
             await _context.SaveChangesAsync();
 

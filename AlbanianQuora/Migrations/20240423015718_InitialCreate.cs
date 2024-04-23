@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AlbanianQuora.Migrations
 {
     /// <inheritdoc />
-    public partial class QuestionMig : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -25,18 +25,40 @@ namespace AlbanianQuora.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Users",
+                columns: table => new
+                {
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    FirstName = table.Column<string>(type: "text", nullable: false),
+                    LastName = table.Column<string>(type: "text", nullable: false),
+                    Email = table.Column<string>(type: "text", nullable: false),
+                    Password = table.Column<string>(type: "text", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Users", x => x.UserId);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Questions",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     QuestionTitle = table.Column<string>(type: "text", nullable: true),
                     QuestionDescription = table.Column<string>(type: "text", nullable: true),
-                    Category = table.Column<string>(type: "text", nullable: true),
-                    Date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    QuestionCategoryId = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Questions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Questions_QuestionCategories_QuestionCategoryId",
+                        column: x => x.QuestionCategoryId,
+                        principalTable: "QuestionCategories",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -74,6 +96,11 @@ namespace AlbanianQuora.Migrations
                 name: "IX_Comments_QuestionId",
                 table: "Comments",
                 column: "QuestionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Questions_QuestionCategoryId",
+                table: "Questions",
+                column: "QuestionCategoryId");
         }
 
         /// <inheritdoc />
@@ -83,10 +110,13 @@ namespace AlbanianQuora.Migrations
                 name: "Comments");
 
             migrationBuilder.DropTable(
-                name: "QuestionCategories");
+                name: "Questions");
 
             migrationBuilder.DropTable(
-                name: "Questions");
+                name: "Users");
+
+            migrationBuilder.DropTable(
+                name: "QuestionCategories");
         }
     }
 }

@@ -1,13 +1,15 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
 using AlbanianQuora.Data;
+using AlbanianQuora.DTO;
 using AlbanianQuora.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Web.Http.Cors;
 
 namespace AlbanianQuora.Controllers
 {
+    [EnableCors(origins: "http://localhost:3000", headers: "*", methods: "*")]
     [Route("api/[controller]")]
     [ApiController]
     public class QuestionCategoryController : ControllerBase
@@ -26,12 +28,23 @@ namespace AlbanianQuora.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> PostQuestionCategory(QuestionCategory questionCategory)
+        public async Task<IActionResult> PostQuestionCategory([FromBody] QuestionCategoryDTO categoryDto)
         {
+            if (categoryDto == null || string.IsNullOrWhiteSpace(categoryDto.Category))
+            {
+                return BadRequest("Category name is required");
+            }
+
+            var questionCategory = new QuestionCategory
+            {
+                Id = Guid.NewGuid(), 
+                Category = categoryDto.Category
+            };
+
             _context.QuestionCategories.Add(questionCategory);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetQuestionCategory", new { id = questionCategory.Id }, questionCategory);
+            return CreatedAtAction(nameof(GetQuestionCategory), new { id = questionCategory.Id }, questionCategory);
         }
 
         [HttpGet("{id}")]
