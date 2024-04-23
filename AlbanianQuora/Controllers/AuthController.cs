@@ -8,6 +8,7 @@ using AlbanianQuora.Services;
 using System.Security.Claims;
 using System.Web.Http.Cors;
 using BCrypt.Net;
+using AlbanianQuora.DTO;
 namespace AlbanianQuora.Controllers
 {
     [EnableCors(origins: "http://localhost:3000", headers: "*", methods: "*")]
@@ -18,14 +19,21 @@ namespace AlbanianQuora.Controllers
         private readonly UserDbContext _context = context;
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register(User user)
+        public async Task<IActionResult> Register([FromBody] UserRegisterDTO userDto)
         {
-            if (_context.Users.Any(u => u.Email == user.Email))
+            if (_context.Users.Any(u => u.Email == userDto.Email))
             {
-                return BadRequest("User already exists."); 
+                return BadRequest("User already exists.");
             }
 
-            user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
+            var user = new User
+            {
+                FirstName = userDto.FirstName,
+                LastName = userDto.LastName,
+                Email = userDto.Email,
+                Password = BCrypt.Net.BCrypt.HashPassword(userDto.Password),
+                CreatedAt = DateTime.UtcNow
+            };
 
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
@@ -35,7 +43,7 @@ namespace AlbanianQuora.Controllers
 
 
         [HttpPost("login")]
-        public IActionResult Login([FromBody] UserLogin request)
+        public IActionResult Login([FromBody] UserLoginDTO request)
         {
             var user = _context.Users.FirstOrDefault(u => u.Email == request.Email);
             if (user == null)

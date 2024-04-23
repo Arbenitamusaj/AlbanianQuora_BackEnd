@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AlbanianQuora.Migrations
 {
     [DbContext(typeof(UserDbContext))]
-    [Migration("20240423015718_InitialCreate")]
+    [Migration("20240423042415_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
