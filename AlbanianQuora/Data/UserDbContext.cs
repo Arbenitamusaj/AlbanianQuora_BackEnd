@@ -17,5 +17,12 @@ namespace AlbanianQuora.Data
 
         public DbSet<QuestionCategory> QuestionCategories { get; set; }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Question>()
+                .HasOne(q => q.QuestionCategory)  
+                .WithMany(c => c.Questions)      
+                .HasForeignKey(q => q.QuestionCategoryId);  
+        }
     }
 }
