@@ -10,7 +10,7 @@ namespace AlbanianQuora.tests
     {
 
         [Fact]
-        public void GetUsers_ReturnsOkResult()
+        public async Task GetUsers_ReturnsOkResult()
         {
             // Arrange
             var options = new DbContextOptionsBuilder<UserDbContext>()
@@ -26,8 +26,9 @@ namespace AlbanianQuora.tests
             
             dbContext.Users.Add(user1);
             dbContext.Users.Add(user2);
+            await dbContext.SaveChangesAsync();
 
-            var result = controller.GetUsers().Result as OkObjectResult;
+            var result = await controller.GetUsers() as OkObjectResult;
 
             //// Assert
             Assert.NotNull(result);
@@ -35,7 +36,7 @@ namespace AlbanianQuora.tests
         }
 
         [Fact]
-        public void GetUser_ReturnsAddedItem()
+        public async Task GetUser_ReturnsAddedItem()
         {
             // Arrange
             var options = new DbContextOptionsBuilder<UserDbContext>()
@@ -44,10 +45,11 @@ namespace AlbanianQuora.tests
 
             var dbContext = new UserDbContext(options);
             var controller = new UserController(dbContext);
+            await dbContext.SaveChangesAsync();
 
             // Act
             var user = new User { UserId = Guid.NewGuid(), FirstName = "Test", LastName = "Test2", Email = "test@test.com", Password = "password", CreatedAt = new DateTime() };
-            var result = controller.GetUser(user.UserId).Result as OkObjectResult;
+            var result = await controller.GetUser(user.UserId) as OkObjectResult;
 
             // Assert
             Assert.NotNull(result);
