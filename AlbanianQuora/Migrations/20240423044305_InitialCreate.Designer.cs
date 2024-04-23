@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AlbanianQuora.Migrations
 {
     [DbContext(typeof(UserDbContext))]
-    [Migration("20240423042415_InitialCreate")]
+    [Migration("20240423044305_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -72,9 +72,14 @@ namespace AlbanianQuora.Migrations
                     b.Property<string>("QuestionTitle")
                         .HasColumnType("text");
 
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
 
                     b.HasIndex("QuestionCategoryId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Questions");
                 });
@@ -146,10 +151,23 @@ namespace AlbanianQuora.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("AlbanianQuora.Entities.User", "User")
+                        .WithMany("Questions")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("QuestionCategory");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("AlbanianQuora.Entities.QuestionCategory", b =>
+                {
+                    b.Navigation("Questions");
+                });
+
+            modelBuilder.Entity("AlbanianQuora.Entities.User", b =>
                 {
                     b.Navigation("Questions");
                 });

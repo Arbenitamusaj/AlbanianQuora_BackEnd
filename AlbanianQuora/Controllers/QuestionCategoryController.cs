@@ -37,7 +37,7 @@ namespace AlbanianQuora.Controllers
 
             var questionCategory = new QuestionCategory
             {
-                Id = Guid.NewGuid(), 
+                Id = Guid.NewGuid(),
                 Category = categoryDto.Category
             };
 

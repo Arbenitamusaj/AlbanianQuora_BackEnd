@@ -48,6 +48,7 @@ namespace AlbanianQuora.Migrations
                     QuestionTitle = table.Column<string>(type: "text", nullable: true),
                     QuestionDescription = table.Column<string>(type: "text", nullable: true),
                     QuestionCategoryId = table.Column<Guid>(type: "uuid", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
@@ -58,6 +59,12 @@ namespace AlbanianQuora.Migrations
                         column: x => x.QuestionCategoryId,
                         principalTable: "QuestionCategories",
                         principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Questions_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "UserId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -101,6 +108,11 @@ namespace AlbanianQuora.Migrations
                 name: "IX_Questions_QuestionCategoryId",
                 table: "Questions",
                 column: "QuestionCategoryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Questions_UserId",
+                table: "Questions",
+                column: "UserId");
         }
 
         /// <inheritdoc />
@@ -113,10 +125,10 @@ namespace AlbanianQuora.Migrations
                 name: "Questions");
 
             migrationBuilder.DropTable(
-                name: "Users");
+                name: "QuestionCategories");
 
             migrationBuilder.DropTable(
-                name: "QuestionCategories");
+                name: "Users");
         }
     }
 }

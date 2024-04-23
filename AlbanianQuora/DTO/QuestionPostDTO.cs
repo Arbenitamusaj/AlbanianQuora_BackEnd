@@ -5,5 +5,6 @@
         public string QuestionTitle { get; set; }
         public string QuestionDescription { get; set; }
         public Guid QuestionCategoryId { get; set; }
+        public Guid UserId { get; set; }
     }
 }

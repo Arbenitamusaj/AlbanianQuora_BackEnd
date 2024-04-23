@@ -1,13 +1,19 @@
-﻿using AlbanianQuora.DTO;
-using AlbanianQuora.Data;
+﻿using AlbanianQuora.Data;
 using AlbanianQuora.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
+using System.Web.Http.Cors;
+using Microsoft.AspNetCore.Authorization;
+using AlbanianQuora.DTO;
+
+
 
 
 
 namespace AlbanianQuora.Controllers
 {
+    [EnableCors(origins: "http://localhost:3000", headers: "*", methods: "*")]
     [Route("api/[controller]")]
     [ApiController]
     public class QuestionController : ControllerBase
@@ -28,26 +34,43 @@ namespace AlbanianQuora.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> PostQuestion([FromBody] QuestionPostDTO questionDto)
+        [Authorize] // Make sure to authorize the request
+                    // Ensure this class is imported correctly
+        public IActionResult PostQuestion([FromBody] QuestionPostDTO questionDTO)
         {
-            if (questionDto == null)
+            // This line gets the user ID from the claims which were populated by the JWT middleware after the token was verified
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+
+            if (userIdClaim == null)
             {
-                return BadRequest("Invalid question data");
+                return Unauthorized("User ID is missing in the token");
             }
 
-            var question = new Question
+            // Parse the user ID into a Guid
+            if (!Guid.TryParse(userIdClaim.Value, out var userId))
             {
-                QuestionTitle = questionDto.QuestionTitle,
-                QuestionDescription = questionDto.QuestionDescription,
-                QuestionCategoryId = questionDto.QuestionCategoryId,
-                CreatedAt = DateTime.UtcNow  
+                return Unauthorized("User ID is invalid");
+            }
+
+            var newQuestion = new Question
+            {
+                // Assign the user ID from the token claim
+                UserId = userId,
+                QuestionTitle = questionDTO.QuestionTitle,
+                QuestionDescription = questionDTO.QuestionDescription,
+                QuestionCategoryId = questionDTO.QuestionCategoryId
+                // Other properties as needed
             };
 
-            _context.Questions.Add(question);
-            await _context.SaveChangesAsync();
+            // Save the new question to the database
+            _context.Questions.Add(newQuestion);
+            _context.SaveChanges();
 
-            return CreatedAtAction("GetQuestion", new { id = question.Id }, question);
+            return Ok(new { Message = "Question posted successfully" });
         }
+
+
+
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetQuestion(Guid id)
@@ -59,7 +82,7 @@ namespace AlbanianQuora.Controllers
             }
             return Ok(question);
         }
-      
+
         [HttpPut("{id}")]
         public async Task<IActionResult> PutQuestion(Guid id, Question question)
         {
@@ -89,7 +112,7 @@ namespace AlbanianQuora.Controllers
             return NoContent();
         }
 
-    
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteQuestion(Guid id)
         {
@@ -109,5 +132,9 @@ namespace AlbanianQuora.Controllers
         {
             return _context.Questions.Any(e => e.Id == id);
         }
+    }
+
+    public class QuestionDTO
+    {
     }
 }

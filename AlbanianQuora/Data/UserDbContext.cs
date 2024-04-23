@@ -22,7 +22,11 @@ namespace AlbanianQuora.Data
             modelBuilder.Entity<Question>()
                 .HasOne(q => q.QuestionCategory)  
                 .WithMany(c => c.Questions)      
-                .HasForeignKey(q => q.QuestionCategoryId);  
+                .HasForeignKey(q => q.QuestionCategoryId);
+            modelBuilder.Entity<Question>()
+                .HasOne(q => q.User)
+                .WithMany(u => u.Questions)
+                .HasForeignKey(q => q.UserId);
         }
     }
 }
