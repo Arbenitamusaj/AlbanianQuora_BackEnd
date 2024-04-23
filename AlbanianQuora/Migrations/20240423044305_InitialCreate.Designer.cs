@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AlbanianQuora.Migrations
 {
     [DbContext(typeof(UserDbContext))]
-    [Migration("20240420171728_QuestionMig")]
-    partial class QuestionMig
+    [Migration("20240423044305_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -60,11 +60,11 @@ namespace AlbanianQuora.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("Category")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("Date")
+                    b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("QuestionCategoryId")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("QuestionDescription")
                         .HasColumnType("text");
@@ -72,7 +72,14 @@ namespace AlbanianQuora.Migrations
                     b.Property<string>("QuestionTitle")
                         .HasColumnType("text");
 
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("QuestionCategoryId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Questions");
                 });
@@ -134,6 +141,35 @@ namespace AlbanianQuora.Migrations
                     b.Navigation("Author");
 
                     b.Navigation("Question");
+                });
+
+            modelBuilder.Entity("AlbanianQuora.Entities.Question", b =>
+                {
+                    b.HasOne("AlbanianQuora.Entities.QuestionCategory", "QuestionCategory")
+                        .WithMany("Questions")
+                        .HasForeignKey("QuestionCategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AlbanianQuora.Entities.User", "User")
+                        .WithMany("Questions")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("QuestionCategory");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("AlbanianQuora.Entities.QuestionCategory", b =>
+                {
+                    b.Navigation("Questions");
+                });
+
+            modelBuilder.Entity("AlbanianQuora.Entities.User", b =>
+                {
+                    b.Navigation("Questions");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,11 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
-namespace AlbanianQuora.Entities
 
+namespace AlbanianQuora.DTO
 {
-    public class User
+    public class UserRegisterDTO
     {
-        public Guid UserId { get; set; } = Guid.NewGuid();
-
         [Required]
         public string FirstName { get; set; }
 
@@ -18,9 +16,5 @@ namespace AlbanianQuora.Entities
 
         [Required]
         public string Password { get; set; }
-
-        public List<Question> Questions { get; set; }
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-
     }
 }
