@@ -3,6 +3,7 @@ using AlbanianQuora.Entities;
 using AlbanianQuora.Controllers;
 using AlbanianQuora.Data;
 using Microsoft.AspNetCore.Mvc;
+using System.Runtime.Intrinsics.X86;
 
 namespace AlbanianQuora.tests
 {
@@ -14,7 +15,7 @@ namespace AlbanianQuora.tests
         {
             // Arrange
             var options = new DbContextOptionsBuilder<UserDbContext>()
-            .UseNpgsql("Host=localhost; Port=5432; Database=mydb; Username=postgres; Password=postgres")
+            .UseNpgsql("Host=albquoradb.postgres.database.azure.com; Port=5432; Database=albquora; Username=albquora; Password=FwePjvwFXVwN8Hy1@")
             .Options;
             //Testing
             var dbContext = new UserDbContext(options);
@@ -40,7 +41,7 @@ namespace AlbanianQuora.tests
         {
             // Arrange
             var options = new DbContextOptionsBuilder<UserDbContext>()
-            .UseNpgsql("Host=localhost; Port=5432; Database=mydb; Username=postgres; Password=postgres")
+            .UseNpgsql("Host=albquoradb.postgres.database.azure.com; Port=5432; Database=albquora; Username=albquora; Password=FwePjvwFXVwN8Hy1@")
             .Options;
 
             var dbContext = new UserDbContext(options);
@@ -49,6 +50,7 @@ namespace AlbanianQuora.tests
 
             // Act
             var user = new User { UserId = Guid.NewGuid(), FirstName = "Test", LastName = "Test2", Email = "test@test.com", Password = "password", CreatedAt = new DateTime() };
+            dbContext.Users.Add(user);
             var result = await controller.GetUser(user.UserId) as OkObjectResult;
 
             // Assert
