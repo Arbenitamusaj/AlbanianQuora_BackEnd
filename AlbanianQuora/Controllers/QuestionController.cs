@@ -29,16 +29,45 @@ namespace AlbanianQuora.Controllers
         [HttpGet]
         public async Task<IActionResult> GetQuestions()
         {
-            return Ok(await _context.Questions.ToListAsync());
+            var questions = await _context.Questions
+                .Select(q => new QuestionGetDTO
+                {
+                    QuestionId = q.Id,
+                    Title = q.QuestionTitle,
+                    Content = q.QuestionDescription,
+                    Category = q.QuestionCategory.Category,
+                    UserName = q.User.FirstName,
+                    TimeAgo = q.CreatedAt.ToString("o")
+                })
+                .ToListAsync();
+
+            return Ok(questions);
+        }
+        [HttpGet("ByCategory/{categoryId}")]
+        public async Task<IActionResult> GetQuestionsByCategory(Guid categoryId)
+        {
+            var questions = await _context.Questions
+                .Where(q => q.QuestionCategoryId == categoryId) 
+                .Select(q => new QuestionGetDTO
+                {
+                    QuestionId = q.Id,
+                    Title = q.QuestionTitle,
+                    Content = q.QuestionDescription,
+                    Category = q.QuestionCategory.Category,
+                    UserName = q.User.FirstName,
+                    TimeAgo = q.CreatedAt.ToString("o")
+                })
+                .ToListAsync();
+
+            return Ok(questions);
         }
 
 
+
         [HttpPost]
-        [Authorize] // Make sure to authorize the request
-                    // Ensure this class is imported correctly
+        [Authorize] 
         public IActionResult PostQuestion([FromBody] QuestionPostDTO questionDTO)
         {
-            // This line gets the user ID from the claims which were populated by the JWT middleware after the token was verified
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
 
             if (userIdClaim == null)
@@ -46,7 +75,6 @@ namespace AlbanianQuora.Controllers
                 return Unauthorized("User ID is missing in the token");
             }
 
-            // Parse the user ID into a Guid
             if (!Guid.TryParse(userIdClaim.Value, out var userId))
             {
                 return Unauthorized("User ID is invalid");
@@ -54,23 +82,17 @@ namespace AlbanianQuora.Controllers
 
             var newQuestion = new Question
             {
-                // Assign the user ID from the token claim
                 UserId = userId,
                 QuestionTitle = questionDTO.QuestionTitle,
                 QuestionDescription = questionDTO.QuestionDescription,
                 QuestionCategoryId = questionDTO.QuestionCategoryId
-                // Other properties as needed
             };
 
-            // Save the new question to the database
             _context.Questions.Add(newQuestion);
             _context.SaveChanges();
 
             return Ok(new { Message = "Question posted successfully" });
         }
-
-
-
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetQuestion(Guid id)
