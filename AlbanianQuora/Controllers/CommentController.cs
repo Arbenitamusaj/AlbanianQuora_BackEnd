@@ -37,7 +37,7 @@ namespace AlbanianQuora.Controllers
             {
                 Content = commentDTO.Content,
                 QuestionId = questionId,
-                UserId = userId, // UserId is taken from the token
+                UserId = userId, 
                 CreatedAt = DateTime.UtcNow
             };
 
@@ -47,6 +47,22 @@ namespace AlbanianQuora.Controllers
             return Ok(new { comment.Id, message = "Comment created successfully." });
         }
 
+        [HttpGet("byQuestion/{questionId}")]
+       
+        public async Task<IActionResult> GetCommentsByQuestionId(Guid questionId)
+        {
+            var comments = await _context.Comments
+                .Where(c => c.QuestionId == questionId)
+                .Select(c => new CommentGetDTO
+                {
+                    UserName = c.User.FirstName,
+                    Content = c.Content,
+                    TimeAgo = c.CreatedAt.ToString("o") // Send the raw date, formatting can be done on the client
+                })
+                .ToListAsync();
+
+            return Ok(comments);
+        }
 
 
 
