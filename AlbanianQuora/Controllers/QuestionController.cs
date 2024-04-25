@@ -117,13 +117,27 @@ namespace AlbanianQuora.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetQuestion(Guid id)
         {
-            var question = await _context.Questions.FindAsync(id);
+            var question = await _context.Questions
+                .Where(q => q.Id == id)
+                .Select(q => new QuestionGetDTO
+                {
+                    QuestionId = q.Id,
+                    Title = q.QuestionTitle,
+                    Content = q.QuestionDescription,
+                    Category = q.QuestionCategory.Category,  
+                    UserName = q.User.FirstName,  
+                    TimeAgo = q.CreatedAt.ToString("o")  
+                })
+                .FirstOrDefaultAsync();
+
             if (question == null)
             {
-                return NotFound();
+                return NotFound("Question not found.");
             }
+
             return Ok(question);
         }
+
 
         [HttpPut("{id}")]
         public async Task<IActionResult> PutQuestion(Guid id, Question question)

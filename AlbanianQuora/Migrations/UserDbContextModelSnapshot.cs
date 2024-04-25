@@ -24,29 +24,27 @@ namespace AlbanianQuora.Migrations
 
             modelBuilder.Entity("AlbanianQuora.Entities.Comment", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<Guid?>("AuthorUserId")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("Body")
+                    b.Property<string>("Content")
                         .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid?>("QuestionId")
+                    b.Property<Guid>("QuestionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AuthorUserId");
-
                     b.HasIndex("QuestionId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Comments");
                 });
@@ -127,17 +125,21 @@ namespace AlbanianQuora.Migrations
 
             modelBuilder.Entity("AlbanianQuora.Entities.Comment", b =>
                 {
-                    b.HasOne("AlbanianQuora.Entities.User", "Author")
-                        .WithMany()
-                        .HasForeignKey("AuthorUserId");
-
                     b.HasOne("AlbanianQuora.Entities.Question", "Question")
-                        .WithMany()
-                        .HasForeignKey("QuestionId");
+                        .WithMany("Comments")
+                        .HasForeignKey("QuestionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Navigation("Author");
+                    b.HasOne("AlbanianQuora.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Question");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("AlbanianQuora.Entities.Question", b =>
@@ -157,6 +159,11 @@ namespace AlbanianQuora.Migrations
                     b.Navigation("QuestionCategory");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("AlbanianQuora.Entities.Question", b =>
+                {
+                    b.Navigation("Comments");
                 });
 
             modelBuilder.Entity("AlbanianQuora.Entities.QuestionCategory", b =>
