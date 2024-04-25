@@ -25,7 +25,6 @@ namespace AlbanianQuora.Controllers
             _context = context;
         }
 
-
         [HttpGet]
         public async Task<IActionResult> GetQuestions()
         {
@@ -43,6 +42,27 @@ namespace AlbanianQuora.Controllers
 
             return Ok(questions);
         }
+
+        [HttpGet("latest")]
+        public async Task<IActionResult> GetLatestQuestions()
+        {
+            var latestQuestions = await _context.Questions
+                .OrderByDescending(q => q.CreatedAt)
+                .Take(20) 
+                .Select(q => new QuestionGetDTO
+                {
+                    QuestionId = q.Id,
+                    Title = q.QuestionTitle,
+                    Content = q.QuestionDescription,
+                    Category = q.QuestionCategory.Category,
+                    UserName = q.User.FirstName,
+                    TimeAgo = q.CreatedAt.ToString("o")
+                })
+                .ToListAsync();
+
+            return Ok(latestQuestions);
+        }
+
         [HttpGet("ByCategory/{categoryId}")]
         public async Task<IActionResult> GetQuestionsByCategory(Guid categoryId)
         {
@@ -97,13 +117,27 @@ namespace AlbanianQuora.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetQuestion(Guid id)
         {
-            var question = await _context.Questions.FindAsync(id);
+            var question = await _context.Questions
+                .Where(q => q.Id == id)
+                .Select(q => new QuestionGetDTO
+                {
+                    QuestionId = q.Id,
+                    Title = q.QuestionTitle,
+                    Content = q.QuestionDescription,
+                    Category = q.QuestionCategory.Category,  
+                    UserName = q.User.FirstName,  
+                    TimeAgo = q.CreatedAt.ToString("o")  
+                })
+                .FirstOrDefaultAsync();
+
             if (question == null)
             {
-                return NotFound();
+                return NotFound("Question not found.");
             }
+
             return Ok(question);
         }
+
 
         [HttpPut("{id}")]
         public async Task<IActionResult> PutQuestion(Guid id, Question question)
