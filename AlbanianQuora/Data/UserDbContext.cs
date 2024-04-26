@@ -17,6 +17,9 @@ namespace AlbanianQuora.Data
 
         public DbSet<QuestionCategory> QuestionCategories { get; set; }
 
+        public DbSet<Like> Likes { get; set; }
+
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Question>()
@@ -35,6 +38,19 @@ namespace AlbanianQuora.Data
                 .HasOne(c => c.User)         
                 .WithMany(u => u.Comments)  
                 .HasForeignKey(c => c.UserId);
+            modelBuilder.Entity<Like>()
+                .HasOne(l => l.User)
+                .WithMany(u => u.Likes)
+                .HasForeignKey(l => l.UserId);
+
+            modelBuilder.Entity<Like>()
+                .HasOne(l => l.Question)
+                .WithMany(q => q.Likes)
+                .HasForeignKey(l => l.QuestionId);
+
+            modelBuilder.Entity<Like>()
+                .HasIndex(l => new { l.UserId, l.QuestionId })
+                .IsUnique();
         }
     }
 }

@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AlbanianQuora.Migrations
 {
     [DbContext(typeof(UserDbContext))]
-    [Migration("20240424234250_InitialCreate")]
+    [Migration("20240425234126_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -50,6 +50,30 @@ namespace AlbanianQuora.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Comments");
+                });
+
+            modelBuilder.Entity("AlbanianQuora.Entities.Like", b =>
+                {
+                    b.Property<int>("LikeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("LikeId"));
+
+                    b.Property<Guid>("QuestionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("LikeId");
+
+                    b.HasIndex("QuestionId");
+
+                    b.HasIndex("UserId", "QuestionId")
+                        .IsUnique();
+
+                    b.ToTable("Likes");
                 });
 
             modelBuilder.Entity("AlbanianQuora.Entities.Question", b =>
@@ -135,7 +159,26 @@ namespace AlbanianQuora.Migrations
                         .IsRequired();
 
                     b.HasOne("AlbanianQuora.Entities.User", "User")
-                        .WithMany()
+                        .WithMany("Comments")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Question");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("AlbanianQuora.Entities.Like", b =>
+                {
+                    b.HasOne("AlbanianQuora.Entities.Question", "Question")
+                        .WithMany("Likes")
+                        .HasForeignKey("QuestionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AlbanianQuora.Entities.User", "User")
+                        .WithMany("Likes")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -167,6 +210,8 @@ namespace AlbanianQuora.Migrations
             modelBuilder.Entity("AlbanianQuora.Entities.Question", b =>
                 {
                     b.Navigation("Comments");
+
+                    b.Navigation("Likes");
                 });
 
             modelBuilder.Entity("AlbanianQuora.Entities.QuestionCategory", b =>
@@ -176,6 +221,10 @@ namespace AlbanianQuora.Migrations
 
             modelBuilder.Entity("AlbanianQuora.Entities.User", b =>
                 {
+                    b.Navigation("Comments");
+
+                    b.Navigation("Likes");
+
                     b.Navigation("Questions");
                 });
 #pragma warning restore 612, 618
