@@ -161,6 +161,34 @@ namespace AlbanianQuora.Controllers
             return NoContent();
         }
 
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchQuestions(string search)
+        {
+            if (string.IsNullOrWhiteSpace(search))
+            {
+                return BadRequest("Search term is required.");
+            }
+
+            var searchLower = search.ToLower();
+
+            var questions = await _context.Questions
+                .Where(q => q.QuestionTitle.ToLower().Contains(searchLower)) 
+                .Select(q => new QuestionGetDTO
+                {
+                    QuestionId = q.Id,
+                    Title = q.QuestionTitle,
+                    Content = q.QuestionDescription,
+                    Category = q.QuestionCategory.Category,
+                    UserName = q.User.FirstName,
+                    TimeAgo = q.CreatedAt.ToString("o")
+                })
+                .ToListAsync();
+
+            return Ok(questions);
+        }
+
+
+
         [HttpGet("mostCommented")]
         public async Task<IActionResult> GetMostCommentedQuestions()
         {
