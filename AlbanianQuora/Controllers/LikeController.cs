@@ -21,8 +21,6 @@ namespace AlbanianQuora.Controllers
             _context = context;
         }
 
-
-
         [HttpGet("hasLiked/{questionId}")]
         [Authorize]
         public async Task<IActionResult> HasLiked(Guid questionId)
