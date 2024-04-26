@@ -21,6 +21,7 @@ namespace AlbanianQuora.Entities
 
         public virtual ICollection<Comment> Comments { get; set; }
         public List<Question> Questions { get; set; }
+        public ICollection<Like> Likes { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     }
