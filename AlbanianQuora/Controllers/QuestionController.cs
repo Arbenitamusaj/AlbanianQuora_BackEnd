@@ -202,6 +202,41 @@ namespace AlbanianQuora.Controllers
             return Ok(latestQuestions);
         }
 
+        [HttpGet("mostViewed")]
+        public async Task<IActionResult> GetMostViewedQuestions()
+        {
+            var latestQuestions = await _context.Questions
+                .OrderByDescending(q => q.Views)
+                .Take(20)
+                .Select(q => new QuestionGetDTO
+                {
+                    QuestionId = q.Id,
+                    Title = q.QuestionTitle,
+                    Content = q.QuestionDescription,
+                    Category = q.QuestionCategory.Category,
+                    UserName = q.User.FirstName,
+                    TimeAgo = q.CreatedAt.ToString("o")
+                })
+                .ToListAsync();
+
+            return Ok(latestQuestions);
+        }
+
+        [HttpPost("incrementView/{questionId}")]
+        public async Task<IActionResult> IncrementViewCount(Guid questionId)
+        {
+            var question = await _context.Questions.FindAsync(questionId);
+            if (question == null)
+            {
+                return NotFound("Question not found");
+            }
+
+            question.Views++;  
+            await _context.SaveChangesAsync();
+
+            return NoContent(); 
+        }
+
         private bool QuestionExists(Guid id)
         {
             return _context.Questions.Any(e => e.Id == id);

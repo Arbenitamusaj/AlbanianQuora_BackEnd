@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AlbanianQuora.Migrations
 {
     [DbContext(typeof(UserDbContext))]
-    [Migration("20240425234126_InitialCreate")]
+    [Migration("20240426032543_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -96,6 +96,9 @@ namespace AlbanianQuora.Migrations
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
+
+                    b.Property<int>("Views")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 

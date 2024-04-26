@@ -94,6 +94,9 @@ namespace AlbanianQuora.Migrations
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
+                    b.Property<int>("Views")
+                        .HasColumnType("integer");
+
                     b.HasKey("Id");
 
                     b.HasIndex("QuestionCategoryId");

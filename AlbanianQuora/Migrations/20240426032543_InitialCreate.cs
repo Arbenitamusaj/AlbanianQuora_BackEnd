@@ -48,6 +48,7 @@ namespace AlbanianQuora.Migrations
                     QuestionTitle = table.Column<string>(type: "text", nullable: true),
                     QuestionDescription = table.Column<string>(type: "text", nullable: true),
                     QuestionCategoryId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Views = table.Column<int>(type: "integer", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },

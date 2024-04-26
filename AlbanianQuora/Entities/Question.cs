@@ -8,6 +8,7 @@ namespace AlbanianQuora.Entities
         public string QuestionDescription { get; set; }
         public Guid QuestionCategoryId { get; set; }
         public QuestionCategory QuestionCategory { get; set; }
+        public int Views { get; set; }
         public Guid UserId { get; set; }
         public User User { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
