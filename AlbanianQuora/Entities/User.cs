@@ -19,7 +19,9 @@ namespace AlbanianQuora.Entities
         [Required]
         public string Password { get; set; }
 
-
+        public virtual ICollection<Comment> Comments { get; set; }
+        public List<Question> Questions { get; set; }
+        public ICollection<Like> Likes { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     }
