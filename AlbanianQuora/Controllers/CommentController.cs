@@ -55,6 +55,8 @@ namespace AlbanianQuora.Controllers
                 .Where(c => c.QuestionId == questionId)
                 .Select(c => new CommentGetDTO
                 {
+                    Id = c.Id,
+                    UserId = c.User.UserId,
                     UserName = c.User.FirstName,
                     Content = c.Content,
                     TimeAgo = c.CreatedAt.ToString("o") // Send the raw date, formatting can be done on the client
@@ -62,6 +64,76 @@ namespace AlbanianQuora.Controllers
                 .ToListAsync();
 
             return Ok(comments);
+        }
+
+        [HttpPut("comments/{commentId}")]
+        [Authorize]
+        public async Task<IActionResult> UpdateComment(Guid commentId, [FromBody] CommentPostDTO commentDTO)
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+
+            if (userIdClaim == null)
+            {
+                return Unauthorized("User ID is missing in the token");
+            }
+
+            if (!Guid.TryParse(userIdClaim.Value, out var userId))
+            {
+                return Unauthorized("User ID is invalid");
+            }
+
+            var comment = await _context.Comments.FirstOrDefaultAsync(c => c.Id == commentId);
+
+            if (comment == null)
+            {
+                return NotFound("Comment not found");
+            }
+
+            if (comment.UserId != userId)
+            {
+                return BadRequest("You are not authorized to update this comment");
+            }
+
+            comment.Content = commentDTO.Content; 
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new { comment.Id, message = "Comment updated successfully." });
+        }
+
+
+        [HttpDelete("comments/{commentId}")]
+        [Authorize]
+        public async Task<IActionResult> DeleteComment(Guid commentId)
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+
+            if (userIdClaim == null)
+            {
+                return Unauthorized("User ID is missing in the token");
+            }
+
+            if (!Guid.TryParse(userIdClaim.Value, out var userId))
+            {
+                return Unauthorized("User ID is invalid");
+            }
+
+            var comment = await _context.Comments.FirstOrDefaultAsync(c => c.Id == commentId);
+
+            if (comment == null)
+            {
+                return NotFound("Comment not found");
+            }
+
+            if (comment.UserId != userId)
+            {
+                return BadRequest("You are not authorized to delete this comment");
+            }
+
+            _context.Comments.Remove(comment);
+            await _context.SaveChangesAsync();
+
+            return Ok("Comment deleted successfully.");
         }
 
 
