@@ -43,26 +43,6 @@ namespace AlbanianQuora.Controllers
             return Ok(questions);
         }
 
-        [HttpGet("latest")]
-        public async Task<IActionResult> GetLatestQuestions()
-        {
-            var latestQuestions = await _context.Questions
-                .OrderByDescending(q => q.CreatedAt)
-                .Take(20) 
-                .Select(q => new QuestionGetDTO
-                {
-                    QuestionId = q.Id,
-                    Title = q.QuestionTitle,
-                    Content = q.QuestionDescription,
-                    Category = q.QuestionCategory.Category,
-                    UserName = q.User.FirstName,
-                    TimeAgo = q.CreatedAt.ToString("o")
-                })
-                .ToListAsync();
-
-            return Ok(latestQuestions);
-        }
-
         [HttpGet("ByCategory/{categoryId}")]
         public async Task<IActionResult> GetQuestionsByCategory(Guid categoryId)
         {
@@ -81,8 +61,6 @@ namespace AlbanianQuora.Controllers
 
             return Ok(questions);
         }
-
-
 
         [HttpPost]
         [Authorize] 
@@ -168,7 +146,6 @@ namespace AlbanianQuora.Controllers
             return NoContent();
         }
 
-
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteQuestion(Guid id)
         {
@@ -182,6 +159,82 @@ namespace AlbanianQuora.Controllers
             await _context.SaveChangesAsync();
 
             return NoContent();
+        }
+
+        [HttpGet("mostCommented")]
+        public async Task<IActionResult> GetMostCommentedQuestions()
+        {
+            var questions = await _context.Questions
+                .Include(q => q.Comments)  
+                .OrderByDescending(q => q.Comments.Count)
+                .Take(10)
+                .Select(q => new QuestionGetDTO
+                {
+                    QuestionId = q.Id,
+                    Title = q.QuestionTitle,
+                    Content = q.QuestionDescription,
+                    Category = q.QuestionCategory.Category,
+                    UserName = q.User.FirstName, 
+                    TimeAgo = q.CreatedAt.ToString("o") 
+                })
+                .ToListAsync();
+
+            return Ok(questions);
+        }
+
+        [HttpGet("latest")]
+        public async Task<IActionResult> GetLatestQuestions()
+        {
+            var latestQuestions = await _context.Questions
+                .OrderByDescending(q => q.CreatedAt)
+                .Take(20)
+                .Select(q => new QuestionGetDTO
+                {
+                    QuestionId = q.Id,
+                    Title = q.QuestionTitle,
+                    Content = q.QuestionDescription,
+                    Category = q.QuestionCategory.Category,
+                    UserName = q.User.FirstName,
+                    TimeAgo = q.CreatedAt.ToString("o")
+                })
+                .ToListAsync();
+
+            return Ok(latestQuestions);
+        }
+
+        [HttpGet("mostViewed")]
+        public async Task<IActionResult> GetMostViewedQuestions()
+        {
+            var latestQuestions = await _context.Questions
+                .OrderByDescending(q => q.Views)
+                .Take(20)
+                .Select(q => new QuestionGetDTO
+                {
+                    QuestionId = q.Id,
+                    Title = q.QuestionTitle,
+                    Content = q.QuestionDescription,
+                    Category = q.QuestionCategory.Category,
+                    UserName = q.User.FirstName,
+                    TimeAgo = q.CreatedAt.ToString("o")
+                })
+                .ToListAsync();
+
+            return Ok(latestQuestions);
+        }
+
+        [HttpPost("incrementView/{questionId}")]
+        public async Task<IActionResult> IncrementViewCount(Guid questionId)
+        {
+            var question = await _context.Questions.FindAsync(questionId);
+            if (question == null)
+            {
+                return NotFound("Question not found");
+            }
+
+            question.Views++;  
+            await _context.SaveChangesAsync();
+
+            return NoContent(); 
         }
 
         private bool QuestionExists(Guid id)

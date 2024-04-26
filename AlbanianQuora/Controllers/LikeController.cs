@@ -100,6 +100,27 @@ namespace AlbanianQuora.Controllers
             return Ok();
         }
 
+        [HttpGet("mostLiked")]
+        public async Task<IActionResult> GetMostLikedQuestions()
+        {
+            var questions = await _context.Questions
+                .OrderByDescending(q => q.Likes.Count)
+                .Take(10)
+                .Select(q => new QuestionGetDTO
+                {
+                    QuestionId = q.Id,
+                    Title = q.QuestionTitle,
+                    Content = q.QuestionDescription,
+                    Category = q.QuestionCategory.Category, 
+                    UserName = q.User.FirstName,
+                    TimeAgo = q.CreatedAt.ToString("o")
+                })
+                .ToListAsync();
+
+            return Ok(questions);
+        }
+
+
 
     }
 }
