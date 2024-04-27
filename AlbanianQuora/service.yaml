@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: AlbanianQuora  # Replace with your service name
+  namespace: dotnetapp  # Optionally specify a namespace
+spec:
+  selector:
+    app: AlbanianQuora
+  ports:
+  - protocol: TCP
+    port: 80  # Service port (adjust if needed)
+    targetPort: 80  # Port on the pod where the app listens
+  type: LoadBalancer  # Adjust service type as needed (e.g., NodePort, ClusterIP)
