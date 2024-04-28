@@ -14,7 +14,7 @@ using AlbanianQuora.DTO;
 namespace AlbanianQuora.Controllers
 {
     [EnableCors(origins: "http://localhost:3000", headers: "*", methods: "*")]
-    [Route("api/[controller]")]
+    [Route("api")]
     [ApiController]
     public class QuestionController : ControllerBase
     {
@@ -25,7 +25,7 @@ namespace AlbanianQuora.Controllers
             _context = context;
         }
 
-        [HttpGet]
+        [HttpGet("questions")]
         public async Task<IActionResult> GetQuestions()
         {
             var questions = await _context.Questions
@@ -43,7 +43,7 @@ namespace AlbanianQuora.Controllers
             return Ok(questions);
         }
 
-        [HttpGet("ByCategory/{categoryId}")]
+        [HttpGet("question/{categoryId}")]
         public async Task<IActionResult> GetQuestionsByCategory(Guid categoryId)
         {
             var questions = await _context.Questions
@@ -62,7 +62,7 @@ namespace AlbanianQuora.Controllers
             return Ok(questions);
         }
 
-        [HttpPost]
+        [HttpPost("question")]
         [Authorize] 
         public IActionResult PostQuestion([FromBody] QuestionPostDTO questionDTO)
         {
@@ -92,7 +92,7 @@ namespace AlbanianQuora.Controllers
             return Ok(new { Message = "Question posted successfully" });
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("question/{id}")]
         public async Task<IActionResult> GetQuestion(Guid id)
         {
             var question = await _context.Questions
@@ -117,7 +117,7 @@ namespace AlbanianQuora.Controllers
         }
 
 
-        [HttpPut("{id}")]
+        [HttpPut("question/{id}")]
         public async Task<IActionResult> PutQuestion(Guid id, Question question)
         {
             if (id != question.Id)
@@ -146,7 +146,7 @@ namespace AlbanianQuora.Controllers
             return NoContent();
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("question/{id}")]
         public async Task<IActionResult> DeleteQuestion(Guid id)
         {
             var question = await _context.Questions.FindAsync(id);
@@ -161,7 +161,7 @@ namespace AlbanianQuora.Controllers
             return NoContent();
         }
 
-        [HttpGet("search")]
+        [HttpGet("question/title/search")]
         public async Task<IActionResult> SearchQuestions(string search)
         {
             if (string.IsNullOrWhiteSpace(search))
@@ -189,7 +189,7 @@ namespace AlbanianQuora.Controllers
 
 
 
-        [HttpGet("mostCommented")]
+        [HttpGet("question/mostCommented")]
         public async Task<IActionResult> GetMostCommentedQuestions()
         {
             var questions = await _context.Questions
@@ -210,7 +210,7 @@ namespace AlbanianQuora.Controllers
             return Ok(questions);
         }
 
-        [HttpGet("latest")]
+        [HttpGet("question/latest")]
         public async Task<IActionResult> GetLatestQuestions()
         {
             var latestQuestions = await _context.Questions
@@ -230,7 +230,7 @@ namespace AlbanianQuora.Controllers
             return Ok(latestQuestions);
         }
 
-        [HttpGet("mostViewed")]
+        [HttpGet("question/mostViewed")]
         public async Task<IActionResult> GetMostViewedQuestions()
         {
             var latestQuestions = await _context.Questions

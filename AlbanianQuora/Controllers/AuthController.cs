@@ -13,7 +13,7 @@ namespace AlbanianQuora.Controllers
 {
     [EnableCors(origins: "http://localhost:3000", headers: "*", methods: "*")]
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/user")]
     public class Authcontroller(UserDbContext context) : ControllerBase
     {
         private readonly UserDbContext _context = context;

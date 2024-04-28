@@ -11,12 +11,12 @@ using AlbanianQuora.DTO;
 namespace AlbanianQuora.Controllers
 {
     [EnableCors(origins: "http://localhost:3000", headers: "*", methods: "*")]
-    [Route("[controller]")]
+    [Route("api")]
     public class CommentController(UserDbContext context) : ControllerBase
     {
         private readonly UserDbContext _context = context;
 
-        [HttpPost("comments/{questionId}")]
+        [HttpPost("comment/{questionId}")]
         [Authorize]
         public async Task<IActionResult> PostComment(Guid questionId, [FromBody] CommentPostDTO commentDTO)
         {
@@ -47,7 +47,7 @@ namespace AlbanianQuora.Controllers
             return Ok(new { comment.Id, message = "Comment created successfully." });
         }
 
-        [HttpGet("byQuestion/{questionId}")]
+        [HttpGet("comments/{questionId}")]
        
         public async Task<IActionResult> GetCommentsByQuestionId(Guid questionId)
         {
@@ -59,14 +59,14 @@ namespace AlbanianQuora.Controllers
                     UserId = c.User.UserId,
                     UserName = c.User.FirstName,
                     Content = c.Content,
-                    TimeAgo = c.CreatedAt.ToString("o") // Send the raw date, formatting can be done on the client
+                    TimeAgo = c.CreatedAt.ToString("o") 
                 })
                 .ToListAsync();
 
             return Ok(comments);
         }
 
-        [HttpPut("comments/{commentId}")]
+        [HttpPut("comment/{commentId}")]
         [Authorize]
         public async Task<IActionResult> UpdateComment(Guid commentId, [FromBody] CommentPostDTO commentDTO)
         {
@@ -102,7 +102,7 @@ namespace AlbanianQuora.Controllers
         }
 
 
-        [HttpDelete("comments/{commentId}")]
+        [HttpDelete("comment/{commentId}")]
         [Authorize]
         public async Task<IActionResult> DeleteComment(Guid commentId)
         {
