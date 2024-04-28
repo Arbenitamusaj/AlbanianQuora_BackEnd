@@ -59,7 +59,7 @@ namespace AlbanianQuora.Controllers
                     UserId = c.User.UserId,
                     UserName = c.User.FirstName,
                     Content = c.Content,
-                    TimeAgo = c.CreatedAt.ToString("o") // Send the raw date, formatting can be done on the client
+                    TimeAgo = c.CreatedAt.ToString("o") 
                 })
                 .ToListAsync();
 
@@ -101,6 +101,19 @@ namespace AlbanianQuora.Controllers
             return Ok(new { comment.Id, message = "Comment updated successfully." });
         }
 
+        [HttpGet("{id}/commentcount")]
+        public ActionResult<CommentCountDTO> GetCommentCount(Guid id)
+        {
+            var commentCount = _context.Comments.Count(c => c.QuestionId == id);
+
+            var result = new CommentCountDTO
+            {
+                QuestionId = id,
+                CommentCount = commentCount
+            };
+
+            return Ok(result);
+        }
 
         [HttpDelete("comments/{commentId}")]
         [Authorize]
