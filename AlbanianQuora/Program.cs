@@ -13,7 +13,6 @@ namespace AlbanianQuora
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -23,7 +22,6 @@ namespace AlbanianQuora
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("ALBANIAN_QUORA_SECRET_KEY_TOKEN_GENERATE")),
             ValidateIssuer = false,
             ValidateAudience = false,
-            // Set clock skew to zero so tokens expire exactly at token expiration time (instead of 5 minutes later)
             ClockSkew = TimeSpan.Zero
         };
     });
