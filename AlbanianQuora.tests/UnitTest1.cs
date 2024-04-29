@@ -22,9 +22,9 @@ namespace AlbanianQuora.tests
             var controller = new UserController(dbContext);
 
             //// Act
-            var user1 = new User { UserId = Guid.NewGuid(), FirstName = "Test" , LastName = "Test2", Email = "test@test.com", Password = "password", CreatedAt = new DateTime() };
+            var user1 = new User { UserId = Guid.NewGuid(), FirstName = "Test", LastName = "Test2", Email = "test@test.com", Password = "password", CreatedAt = new DateTime() };
             var user2 = new User { UserId = Guid.NewGuid(), FirstName = "Test12", LastName = "Test3", Email = "test1@test.com", Password = "password2", CreatedAt = new DateTime() };
-            
+
             dbContext.Users.Add(user1);
             dbContext.Users.Add(user2);
             await dbContext.SaveChangesAsync();

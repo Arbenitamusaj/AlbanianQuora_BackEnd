@@ -28,7 +28,7 @@ namespace AlbanianQuora.Controllers
         }*/
 
         [HttpGet]
-        [Authorize] 
+        [Authorize]
         public async Task<IActionResult> GetUser()
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);

@@ -10,7 +10,7 @@ using AlbanianQuora.DTO;
 namespace AlbanianQuora.Controllers
 {
     [EnableCors(origins: "http://localhost:3000", headers: "*", methods: "*")]
-    [Route("api/[controller]")]
+    [Route("api")]
     [ApiController]
     public class LikeController : ControllerBase
     {
@@ -42,7 +42,7 @@ namespace AlbanianQuora.Controllers
         }
 
 
-        [HttpGet("count/{questionId}")]
+        [HttpGet("likes/{questionId}")]
         public async Task<IActionResult> CountLikes(Guid questionId)
         {
             var likeCount = await _context.Likes.CountAsync(l => l.QuestionId == questionId);

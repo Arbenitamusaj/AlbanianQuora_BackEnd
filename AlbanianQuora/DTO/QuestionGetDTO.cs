@@ -9,6 +9,7 @@ namespace AlbanianQuora.DTO
         public string Content { get; set; }
         public string Category { get; set; }
         public string UserName { get; set; }
+        public int Views { get; set; }
         public string TimeAgo { get; set; }
     }
 }
