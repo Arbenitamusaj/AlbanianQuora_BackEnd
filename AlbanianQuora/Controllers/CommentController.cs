@@ -101,7 +101,7 @@ namespace AlbanianQuora.Controllers
             return Ok(new { comment.Id, message = "Comment updated successfully." });
         }
 
-        [HttpGet("{id}/commentcount")]
+        [HttpGet("question/{id}/commentcount")]
         public ActionResult<CommentCountDTO> GetCommentCount(Guid id)
         {
             var commentCount = _context.Comments.Count(c => c.QuestionId == id);

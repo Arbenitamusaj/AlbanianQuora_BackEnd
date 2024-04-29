@@ -92,7 +92,7 @@ namespace AlbanianQuora.Controllers
             return Ok(new { Message = "Question posted successfully" });
         }
 
-        [HttpGet("question/{id}")]
+        [HttpGet("question-details/{id}")]
         public async Task<IActionResult> GetQuestion(Guid id)
         {
             var question = await _context.Questions
