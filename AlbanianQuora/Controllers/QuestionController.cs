@@ -29,6 +29,8 @@ namespace AlbanianQuora.Controllers
         public async Task<IActionResult> GetQuestions()
         {
             var questions = await _context.Questions
+                .Include(q => q.QuestionCategory) // Ensure the category is loaded
+                .Include(q => q.User) // If user details are not loaded by default
                 .Select(q => new QuestionGetDTO
                 {
                     QuestionId = q.Id,
@@ -36,9 +38,11 @@ namespace AlbanianQuora.Controllers
                     Content = q.QuestionDescription,
                     Category = q.QuestionCategory.Category,
                     UserName = q.User.FirstName,
+                    Views = q.Views,
                     TimeAgo = q.CreatedAt.ToString("o")
                 })
                 .ToListAsync();
+
 
             return Ok(questions);
         }
@@ -55,6 +59,7 @@ namespace AlbanianQuora.Controllers
                     Content = q.QuestionDescription,
                     Category = q.QuestionCategory.Category,
                     UserName = q.User.FirstName,
+                    Views = q.Views,
                     TimeAgo = q.CreatedAt.ToString("o")
                 })
                 .ToListAsync();
@@ -104,6 +109,7 @@ namespace AlbanianQuora.Controllers
                     Content = q.QuestionDescription,
                     Category = q.QuestionCategory.Category,  
                     UserName = q.User.FirstName,  
+                    Views = q.Views,
                     TimeAgo = q.CreatedAt.ToString("o")  
                 })
                 .FirstOrDefaultAsync();
@@ -180,6 +186,7 @@ namespace AlbanianQuora.Controllers
                     Content = q.QuestionDescription,
                     Category = q.QuestionCategory.Category,
                     UserName = q.User.FirstName,
+                    Views = q.Views,
                     TimeAgo = q.CreatedAt.ToString("o")
                 })
                 .ToListAsync();
@@ -202,7 +209,8 @@ namespace AlbanianQuora.Controllers
                     Title = q.QuestionTitle,
                     Content = q.QuestionDescription,
                     Category = q.QuestionCategory.Category,
-                    UserName = q.User.FirstName, 
+                    UserName = q.User.FirstName,
+                    Views = q.Views,
                     TimeAgo = q.CreatedAt.ToString("o") 
                 })
                 .ToListAsync();
@@ -223,6 +231,7 @@ namespace AlbanianQuora.Controllers
                     Content = q.QuestionDescription,
                     Category = q.QuestionCategory.Category,
                     UserName = q.User.FirstName,
+                    Views = q.Views,
                     TimeAgo = q.CreatedAt.ToString("o")
                 })
                 .ToListAsync();
@@ -243,6 +252,7 @@ namespace AlbanianQuora.Controllers
                     Content = q.QuestionDescription,
                     Category = q.QuestionCategory.Category,
                     UserName = q.User.FirstName,
+                    Views = q.Views,
                     TimeAgo = q.CreatedAt.ToString("o")
                 })
                 .ToListAsync();
