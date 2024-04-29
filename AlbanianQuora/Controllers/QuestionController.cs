@@ -7,10 +7,6 @@ using System.Web.Http.Cors;
 using Microsoft.AspNetCore.Authorization;
 using AlbanianQuora.DTO;
 
-
-
-
-
 namespace AlbanianQuora.Controllers
 {
     [EnableCors(origins: "http://localhost:3000", headers: "*", methods: "*")]
