@@ -20,7 +20,8 @@ namespace AlbanianQuora.tests
         {
 
             var options = new DbContextOptionsBuilder<UserDbContext>()
-             .UseNpgsql("Host=localhost; Port=5432; Database=mydb; Username=postgres; Password=postgres").Options;
+             .UseNpgsql("Host=albquoradb.postgres.database.azure.com; Port=5432; Database=albquora; Username=albquora; Password=FwePjvwFXVwN8Hy1@")
+            .Options;
 
             var dbContext = new UserDbContext(options);
             var controller = new QuestionCategoryController(dbContext);
@@ -48,7 +49,8 @@ namespace AlbanianQuora.tests
         {
             // Arrange
             var options = new DbContextOptionsBuilder<UserDbContext>()
-           .UseNpgsql("Host=localhost; Port=5432; Database=mydb; Username=postgres; Password=postgres").Options;
+           .UseNpgsql("Host=albquoradb.postgres.database.azure.com; Port=5432; Database=albquora; Username=albquora; Password=FwePjvwFXVwN8Hy1@")
+            .Options;
 
             var dbContext = new UserDbContext(options);
             var controller = new QuestionCategoryController(dbContext);
